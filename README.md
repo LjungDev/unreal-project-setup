@@ -1,5 +1,15 @@
 # Unreal Project Setup
 
+- [Unreal Project Setup](#unreal-project-setup)
+  - [Overview](#overview)
+    - [Post-Usage Workflow Tips](#post-usage-workflow-tips)
+      - [Update Content files](#update-content-files)
+      - [Diffing .uasset Files](#diffing-uasset-files)
+      - [Pulling Upstream Changes](#pulling-upstream-changes)
+  - [Installation / Usage](#installation--usage)
+    - [Git settings](#git-settings)
+  - [Notes](#notes)
+
 ## Overview
 
 This is a helper CLI to setup an Unreal Project using an approach of splitting
@@ -92,6 +102,20 @@ For example, to get the result of the example structure, run:
 
 ```shell
 yarn start --projectDir C:\UnrealProjects\MyUnrealProject --newContentDir D:\MyContent\MyCoolGame_Assets
+```
+
+For more detailed info use the `help` command:
+
+```shell
+yarn start --help
+```
+
+### Git settings
+
+A few optional arguments can be provided to change the git user settings used for creating the Content repo and Project repo:
+
+```shell
+yarn start --projectDir C:\UnrealProjects\MyUnrealProject --newContentDir D:\MyContent\MyCoolGame_Assets --gitUserName "Anna Andersson" --gitUserEmail "anna@example.com" --gitSigningKey "ABCDEF0123456789"
 ```
 
 ## Notes
