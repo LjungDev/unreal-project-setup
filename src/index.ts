@@ -2,20 +2,14 @@ import path from "node:path";
 import { exit } from "node:process";
 
 import fs from "fs-extra";
-import yargs from "yargs";
 import chalk from "chalk";
+import dayjs from "dayjs";
 import inquirer from "inquirer";
-import { hideBin } from "yargs/helpers";
 
 import { git } from "./git.js";
+import { GitArgs, getArgs } from "./args.js";
 import Resources from "./resources.js";
 import { endStatusLine, startStatusLine } from "./statusLine.js";
-import dayjs from "dayjs";
-
-interface Args {
-  projectDir: string;
-  newContentDir: string;
-}
 
 interface ProjectInfo {
   projectRoot: string;
@@ -23,26 +17,6 @@ interface ProjectInfo {
   initialContentDir: string;
   newProjectDir: string;
   newContentDir: string;
-}
-
-async function getArgs(): Promise<Args> {
-  return yargs(hideBin(process.argv))
-    .option("projectDir", {
-      type: "string",
-      description:
-        "Location of the Unreal project, e.g. D:\\GameDev\\MyProject. This location should contain the *.uproject file.",
-      requiresArg: true,
-      demandOption: true,
-    })
-    .option("newContentDir", {
-      type: "string",
-      description:
-        "Location to move Contents to, e.g. E:\\NAS\\GameDev\\MyProject_Assets.",
-      requiresArg: true,
-      demandOption: true,
-    })
-    .help()
-    .parse();
 }
 
 async function verifyArgs(
@@ -127,13 +101,32 @@ async function askToContinue(projectInfo: ProjectInfo): Promise<void> {
   }
 }
 
+async function setupGit(
+  repoDir: string,
+  { gitUserName, gitUserEmail, gitSigningKey }: GitArgs
+): Promise<void> {
+  if (gitUserName) {
+    await git(`config user.name ${gitUserName}`, repoDir);
+  }
+  if (gitUserName) {
+    await git(`config user.email ${gitUserEmail}`, repoDir);
+  }
+  if (gitSigningKey) {
+    await git(`config user.signingkey ${gitSigningKey}`, repoDir);
+    await git("config commit.gpgsign true", repoDir);
+    await git("config tag.forceSignAnnotated true", repoDir);
+  }
+}
+
 async function setupContentDir(
   initialContentDir: string,
-  newContentDir: string
+  newContentDir: string,
+  gitArgs: GitArgs
 ): Promise<void> {
   startStatusLine("Setting up Content dir");
 
   await git("init", initialContentDir);
+  await setupGit(initialContentDir, gitArgs);
   await git("branch -m master main", initialContentDir);
   await git(
     "config --local receive.denyCurrentBranch updateInstead",
@@ -180,7 +173,8 @@ async function setupProjectDir(
   initialProjectDir: string,
   newProjectDir: string,
   contentDir: string,
-  projectName: string
+  projectName: string,
+  gitArgs: GitArgs
 ): Promise<void> {
   startStatusLine("Setting up Project dir");
 
@@ -222,6 +216,7 @@ async function setupProjectDir(
   );
 
   await git("init", initialProjectDir);
+  await setupGit(initialProjectDir, gitArgs);
   await git("branch -m master main", initialProjectDir);
   await git(
     `-c protocol.file.allow=always submodule add -b main ${contentDir} ${contentPath}`,
@@ -251,14 +246,16 @@ async function main(): Promise<void> {
 
   await setupContentDir(
     projectInfo.initialContentDir,
-    projectInfo.newContentDir
+    projectInfo.newContentDir,
+    args
   );
 
   await setupProjectDir(
     projectInfo.projectRoot,
     projectInfo.newProjectDir,
     projectInfo.newContentDir,
-    projectInfo.projectName
+    projectInfo.projectName,
+    args
   );
 
   console.log("\nDone! 🥳 Game Dev time❗ 🚀");
