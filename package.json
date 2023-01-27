@@ -1,6 +1,6 @@
 {
   "name": "unreal-project-setup",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "helper CLI to setup an opinionated Unreal Project",
   "exports": "./index.js",
   "repository": "github:LjungDev/unreal-project-setup",
