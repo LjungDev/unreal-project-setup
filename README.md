@@ -27,7 +27,7 @@ and does the following:
 - Adds a git submodule of the new Content repo as the `Content` dir
 - Adds a suitable .gitignore file to the project
 - Adds a basic boilerplate `README.md` to the project
-- Adds a APGLv3 `LICENSE` file (attributed to your default git user name)
+- Adds a MIT `LICENSE` file (attributed to your default git user name)
 
 This takes the structure from something like this:
 
