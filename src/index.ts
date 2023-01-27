@@ -196,7 +196,9 @@ async function setupProjectDir(
     )
   );
 
-  const gitUserName = (await git("config user.name", initialProjectDir)).trim();
+  const gitUserName =
+    gitArgs.gitUserName ??
+    (await git("config user.name", initialProjectDir)).trim();
 
   await Resources.copyFile(".gitignore", newProjectDir);
 
