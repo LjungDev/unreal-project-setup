@@ -227,6 +227,7 @@ async function setupProjectDir(
   await git("config push.recurseSubmodules on-demand", initialProjectDir);
 
   await git("config protocol.file.allow always", fullContentPath);
+  await setupGit(fullContentPath, gitArgs);
   await git("checkout main", fullContentPath);
   await git("-c protocol.file.allow=always pull", fullContentPath);
   await git("add *", initialProjectDir);
